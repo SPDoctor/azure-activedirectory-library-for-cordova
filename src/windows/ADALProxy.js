@@ -110,7 +110,10 @@ var ADALProxy = {
                 }
 
                 if (isPhone) {
-                    // Continuation callback is used when we're running on WindowsPhone which uses
+                  context.acquireTokenSilentAsync(resourceUrl, clientId, userIdentifier).then(function (res) {
+                	if (res.status === AUTH_RESULT_SUCCESS_STATUS) handleAuthResult(win, fail, res);
+                	else {
+                	// Continuation callback is used when we're running on WindowsPhone which uses
                     // AuthenticateAndContinue method instead of AuthenticateAsync, which uses different async model
                     // Continuation callback need to be assigned to Application's 'activated' event.
                     webAuthBrokerContinuationCallback = function (activationArgs) {
@@ -127,26 +130,29 @@ var ADALProxy = {
 
                     WinJS.Application.addEventListener('activated', webAuthBrokerContinuationCallback, true);
 
-                    try {
-                        if (typeof userIdentifier !== 'undefined') {
-                            if (typeof extraQueryParameters === 'undefined') {
-                                context.acquireTokenAndContinue(resourceUrl, clientId, redirectUrl, userIdentifier, function (res) {
-                                    handleAuthResult(win, fail, res);
-                                });
-                            } else {
-                                context.acquireTokenAndContinue(resourceUrl, clientId, redirectUrl, userIdentifier, extraQueryParameters, function (res) {
-                                    handleAuthResult(win, fail, res);
-                                });
-                            }
-                        } else {
-                            context.acquireTokenAndContinue(resourceUrl, clientId, redirectUrl, function (res) {
-                                handleAuthResult(win, fail, res);
-                            });
-                        }
-                    } catch (e) {
-                        fail(e);
-                    }
-                } else {
+                		try {
+                			if (typeof userIdentifier !== 'undefined') {
+                				if (typeof extraQueryParameters === 'undefined') {
+                					context.acquireTokenAndContinue(resourceUrl, clientId, redirectUrl, userIdentifier, function (res) {
+                						handleAuthResult(win, fail, res);
+                					});
+                				} else {
+                					context.acquireTokenAndContinue(resourceUrl, clientId, redirectUrl, userIdentifier, extraQueryParameters, function (res) {
+                						handleAuthResult(win, fail, res);
+                					});
+                				}
+                			} else {
+                				context.acquireTokenAndContinue(resourceUrl, clientId, redirectUrl, function (res) {
+                					handleAuthResult(win, fail, res);
+                				});
+                			}
+                		} catch (e) {
+                			fail(e);
+                		}
+                    } // acquireTokenSilentAsync fail handler
+                	});
+                  } // isPhone
+				else {
                     if (context.useCorporateNetwork) {
                         // Try to SSO first
                         context.acquireTokenAsync(resourceUrl, clientId, Windows.Security.Authentication.Web.WebAuthenticationBroker.getCurrentApplicationCallbackUri(), Microsoft.IdentityModel.Clients.ActiveDirectory.PromptBehavior.never, userIdentifier, extraQueryParameters).then(function (res) {

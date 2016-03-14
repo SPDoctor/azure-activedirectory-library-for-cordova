@@ -157,7 +157,7 @@ var ADALProxy = {
                             }, res);
                         }, fail);
                     } else {
-                        context.acquireTokenAsync(resourceUrl, clientId, redirectUrl, Microsoft.IdentityModel.Clients.ActiveDirectory.PromptBehavior.always, userIdentifier, extraQueryParameters).then(function (res) {
+                        context.acquireTokenAsync(resourceUrl, clientId, redirectUrl, Microsoft.IdentityModel.Clients.ActiveDirectory.PromptBehavior.auto, userIdentifier, extraQueryParameters).then(function (res) {
                             handleAuthResult(win, fail, res);
                         }, fail);
                     }
